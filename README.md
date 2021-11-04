@@ -6,8 +6,6 @@ Plugin de tipo notificación que realiza HTTPS Webhooks Personalizados
 
 1. Descargar el plugin y mover el archivo JAR generado a la carpeta libext de Rundeck.
 
-## Uso
-
 ## Propiedades de la Notificación Personalizada
 
 1. URL Webhook
