@@ -1,17 +1,21 @@
 # Rundeck Custom Notification Plugin
 
-Plugin de tipo notificación que realiza HTTPS Webhooks Personalizados
+This notification plugin allows you send customized messages to a webhook using several parameters.  
 
-## Instalación
 
-1. Descargar el plugin y mover el archivo JAR generado a la carpeta libext de Rundeck.
+## Installation
 
-## Propiedades de la Notificación Personalizada
+1. Download the plugin and put the file into the rundeck´s libext folder.
 
-1. URL Webhook
-2. Tipo de Contenido 
-3. Metodo del Request
-4. Cuerpo del mensaje
+
+## Usage
+
+## Properties setting
+
+1. Webhook URL
+2. Content Type
+3. Request Method
+4. Message Body
 
 
 
