@@ -12,10 +12,13 @@ This notification plugin allows you send customized messages to a webhook using 
 
 ## Properties setting
 
-1. Webhook URL
-2. Content Type
-3. Request Method
-4. Message Body
+### Webhook URL: Valid callback url or HTTP Endpoint
+
+### Content Type: Message content type
+
+### Request Method: The request method
+
+### Message Body: The message body 
 
 
 
