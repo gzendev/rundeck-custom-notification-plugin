@@ -5,20 +5,20 @@ This notification plugin allows you send customized messages to a webhook using 
 
 ## Installation
 
-1. Download the plugin and put the file into the rundeck´s libext folder.
+- Download the plugin and put the file into the rundeck´s libext folder.
 
 
 ## Usage
 
-## Properties setting
+### Properties setting
 
-### Webhook URL: Valid callback url or HTTP Endpoint
+- **_Webhook URL_**: Valid callback url or HTTP Endpoint
 
-### Content Type: Message content type
+- **_Content Type_**: Message content type
 
-### Request Method: The request method
+- **_Request Method_**: The request method
 
-### Message Body: The message body 
+- **_Message Body_**: The message body 
 
 
 
