@@ -41,8 +41,11 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.rundeck:rundeck-core:3.4.5-20211018'
-	implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    implementation 'org.rundeck:rundeck-core:3.4.5-20211018'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    implementation 'org.slf4j:slf4j-api:1.7.32'
+
+    testImplementation 'junit:junit:4.13.2'
 }
 
 task copyToOutput(type: Copy) {

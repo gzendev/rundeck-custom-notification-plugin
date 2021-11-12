@@ -14,6 +14,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dtolabs.rundeck.core.plugins.Plugin;
 import com.dtolabs.rundeck.plugins.descriptions.PluginDescription;
@@ -22,65 +24,85 @@ import com.dtolabs.rundeck.plugins.descriptions.SelectValues;
 import com.dtolabs.rundeck.plugins.descriptions.TextArea;
 import com.dtolabs.rundeck.plugins.notification.NotificationPlugin;
 
-@Plugin(service="Notification",name="CustomWebhookNotificationPlugin")
+@Plugin(service="Notification", name="CustomWebhookNotificationPlugin")
 @PluginDescription(title="Custom Webhook Notification", description="A notification plugin that makes customized HTTP requests")
 public class CustomWebhookNotificationPlugin implements NotificationPlugin {
-  
-  @PluginProperty(name = "webhookUrl", title = "Webhook URL", description = "The webhook url", required = false)
+
+  private static final Logger log = LoggerFactory.getLogger(CustomWebhookNotificationPlugin.class);
+
+  @PluginProperty(name = "webhookUrl", title = "Webhook URL", description = "The webhook url", required = true)
   private String webhookUrl;
-  
-  @PluginProperty(name = "contentType", title = "Content Type", description = "The content type header", required = false)
+
+  @PluginProperty(name = "contentType", title = "Content Type", description = "The content type header", required = true)
   private String contentType;
-  
-  @PluginProperty(name = "requestMethod", title = "Request Method", description = "The request method", required = false)
-  @SelectValues(values = {"GET", "POST", "PUT", "DELETE"})
+
+  @PluginProperty(name = "requestMethod", title = "Request Method", description = "The request method", required = true)
+  @SelectValues(values = {HttpGet.METHOD_NAME,
+          HttpPost.METHOD_NAME,
+          HttpPut.METHOD_NAME,
+          HttpDelete.METHOD_NAME})
   private String requestMethod;
-  
-  @PluginProperty(name = "messageBody", title = "Message Body", description = "The message body", required = false)
+
+  @PluginProperty(name = "messageBody", title = "Message Body", description = "The message body", required = true)
   @TextArea
   private String messageBody;
-  
-  
+
+  public CustomWebhookNotificationPlugin() {}
+
+  public CustomWebhookNotificationPlugin(String webhookUrl, String requestMethod,
+                                         String contentType, String messageBody) {
+    super();
+    this.webhookUrl = webhookUrl;
+    this.contentType = contentType;
+    this.requestMethod = requestMethod;
+    this.messageBody = messageBody;
+  }
+
   private String sendMessage() throws IOException, CustomMessageException {
-    
+
     try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
-      
+
       ResponseHandler<String> responseHandler = response -> {
         int status = response.getStatusLine().getStatusCode();
         if (status >= 200 && status < 300) {
-            HttpEntity entity = response.getEntity();
-            return entity != null ? EntityUtils.toString(entity) : null;
+          HttpEntity entity = response.getEntity();
+          return entity != null ? EntityUtils.toString(entity) : null;
         } else {
-            throw new ClientProtocolException("Unexpected response status: " + status);
+          log.info("Unexpected response status: " + status);
+          throw new ClientProtocolException("Unexpected response status: " + status);
         }
       };
-      
+
       switch (requestMethod) {
-        case "GET":
+        case HttpGet.METHOD_NAME:
           HttpGet httpget = new HttpGet(webhookUrl);
           httpget.setHeader("Accept", contentType);
           httpget.setHeader("Content-type", contentType);
           return httpclient.execute(httpget, responseHandler);
-        case "POST":
+        case HttpPost.METHOD_NAME:
           HttpPost httpPost = new HttpPost(webhookUrl);
           httpPost.setHeader("Accept", contentType);
           httpPost.setHeader("Content-type", contentType);
           httpPost.setEntity(new StringEntity(messageBody));
           return httpclient.execute(httpPost, responseHandler);
-        case "PUT":
+        case HttpPut.METHOD_NAME:
           HttpPut httpPut = new HttpPut(webhookUrl);
           httpPut.setHeader("Accept", contentType);
           httpPut.setHeader("Content-type", contentType);
           httpPut.setEntity(new StringEntity(messageBody));
           return httpclient.execute(httpPut, responseHandler);
-        case "DELETE":
+        case HttpDelete.METHOD_NAME:
           HttpDelete httpDelete = new HttpDelete(webhookUrl);
           httpDelete.setHeader("Accept", contentType);
           httpDelete.setHeader("Content-type", contentType);
           return httpclient.execute(httpDelete, responseHandler);
         default:
-          throw new CustomMessageException("Undefined request method");
+          log.info("Undefined Request Method");
+          throw new CustomMessageException("Undefined Request Method");
       }
+    } catch (Exception e) {
+      log.info(e.getMessage());
+      throw new IOException();
     }
   }
 
@@ -89,7 +111,7 @@ public class CustomWebhookNotificationPlugin implements NotificationPlugin {
     try {
       sendMessage();
     } catch (IOException | CustomMessageException e) {
-      e.printStackTrace();
+      log.info(e.getMessage());
       return false;
     }
     return true;
